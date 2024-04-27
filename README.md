@@ -15,13 +15,13 @@ The assessment for Section 2 involves correcting, enhancing, and developing Pyth
 ## Exercise 1: Correcting and Enhancing the Loss Calculation Script
 
 ### Task Description
-You are provided with a Python script and a JSON file (`data.json`) containing data for five buildings. This script is designed to calculate total projected financial losses, taking into account factors such as inflation over time, the probability of hazard occurrence, and the process of discounting future losses to their present value.
+You are provided with a Python script (`exercise1_losses_calculator.py`) and a JSON file (`data.json`) containing data for five buildings. This script is designed to calculate total projected financial losses, taking into account factors such as inflation over time, the probability of hazard occurrence, and the process of discounting future losses to their present value.
 
 ### Requirements
-- **Future Cost Calculation**: Adjust each building's construction cost by applying an exponential growth rate to reflect inflation over time.
-- **Risk-Adjusted Loss Calculation**: Modify the future construction cost with the likelihood of experiencing a hazard by multiplying it by the hazard probability.
-- **Discounting to Present Value**: Apply a discounting process to calculate the present value of the estimated future losses using a standard discount rate.
-- **Total Projected Loss Calculation**: Sum the present values of the estimated losses from all buildings to determine the total financial impact.
+- **Future Cost Calculation:** Calculate the future construction cost by adjusting the current cost using the inflation rate as an exponent. This method compounds the cost annually, reflecting the cumulative effect of inflation over the specified number of years.
+- **Risk-Adjusted Loss Calculation:** Determine the risk-adjusted loss by modifying the future construction cost with the likelihood of experiencing a hazard. For each building, multiply its future construction cost by its hazard probability to assess the potential financial impact if the hazard were to occur.
+- **Discounting to Present Value:** To calculate the present value of the estimated future losses, apply a discounting process that reflects the principle that future financial losses are less valuable in today's terms. For each building, determine the present value by dividing the risk-adjusted cost by the discount rate plus one. This method translates the future financial impact into an equivalent amount in today's dollars, considering the time value of money.
+- **Total Projected Loss Calculation:** Sum the present values of the estimated losses from all buildings to arrive at the total projected financial impact. This total provides a comprehensive view of the potential losses across the portfolio, combining all individual risk assessments.
 
 ### Data Structure
 Each entry in the `data.json` file includes:
@@ -39,7 +39,7 @@ Each entry in the `data.json` file includes:
 ## Exercise 2: Implementing a Complex Mathematical Loss Formula
 
 ### Task Description
-Implement a complex mathematical formula in Python to calculate potential financial losses using detailed attributes of the same five buildings.
+Implement a complex mathematical formula in Python to calculate the potential financial losses estimate ('LE') using detailed attributes of the same five buildings.
 
 ### Complex Loss Calculation Formula
 $$
@@ -56,7 +56,7 @@ The script should output the individual and total estimated losses for all prope
 ## Exercise 3: Scaling the Loss Calculation Model
 
 ### Task Description
-Provide a written explanation of how you would scale the Python script to efficiently handle a dataset of 1,000,000 buildings.
+Provide a written explanation of how you would scale your Python script from Exercise 2 to efficiently handle a dataset of 1,000,000 buildings.
 
 ### Requirements
 - **Scalability Analysis**: Evaluate the current script's performance with a larger dataset.
@@ -71,14 +71,14 @@ Provide a written explanation of how you would scale the Python script to effici
 ## Exercise 4: Live Interview Frontend Development
 
 ### Task Description
-Develop a small frontend application during the live interview that interfaces with the backend to upload `data.json`, calculate losses, and display the results.
+Develop a small React frontend application during the live interview that interfaces with the backend to upload `data.json`, calculate losses, and display the results.
 
 ### Requirements
 - **User Interface**: Implement functionalities for file uploading, processing through a 'Calculate Losses' button, and result display.
 - **Functionality**: Ensure the application handles data upload, interacts with the backend, and displays the losses accurately.
 
 ### Instructions
-- Use the provided boilerplate code to set up the basic functionalities.
+- Use the provided boilerplate React code to set up the basic functionalities.
 - Focus on creating a user-friendly and effective interface.
 - Be prepared to discuss your implementation and design choices during the interview.
 
