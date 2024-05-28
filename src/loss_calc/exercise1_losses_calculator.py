@@ -1,4 +1,4 @@
-""" This module calculates the total projected losses for a set of buildings based
+"""This module calculates the total projected losses for a set of buildings based
 on their construction cost, inflation rate, hazard probability, and floor area.
 The total projected losses are calculated as the sum of the present value of the
 risk-adjusted loss and the present value of the maintenance cost for each building.
@@ -10,6 +10,9 @@ The module provides two functions:
 - calculate_complex_projected_losses(building_data, years, discount_rate):
     Calculate the total projected losses with additional complexity and errors.
 """
+import argparse
+import time
+
 import numpy as np
 import pandas as pd
 
@@ -29,8 +32,11 @@ def load_data(filepath):
     """
 
     try:
-        df = pd.read_json(filepath)
+        df = pd.read_json(filepath, lines=filepath.endswith(".jsonl"))
     except ValueError as e:
+        print(f"Error loading JSON file: {e}")
+        return None
+    except FileNotFoundError as e:
         print(f"Error loading JSON file: {e}")
         return None
 
@@ -61,6 +67,7 @@ def load_data(filepath):
     df.set_index("buildingId", inplace=True)
     return df
 
+
 # Calculate total projected loss with additional complexity and errors
 def calculate_projected_losses(
     building_data: pd.DataFrame,
@@ -81,7 +88,10 @@ def calculate_projected_losses(
     """
 
     # Calculate future cost
-    future_cost = building_data["construction_cost"] * (1 + building_data["inflation_rate"]) ** years
+    future_cost = (
+        building_data["construction_cost"]
+        * (1 + building_data["inflation_rate"]) ** years
+    )
 
     # Calculate risk-adjusted loss
     risk_adjusted_loss = future_cost * building_data["hazard_probability"]
@@ -97,6 +107,7 @@ def calculate_projected_losses(
     total_loss = present_value_loss.sum() + total_maintenance_cost.sum()
 
     return total_loss
+
 
 # Calculate total projected loss with additional complexity and errors
 def calculate_complex_projected_losses(
@@ -122,15 +133,49 @@ def calculate_complex_projected_losses(
     potential_finantial_losses["total"] = building_data.potential_finantial_losses.sum()
     return potential_finantial_losses
 
+
 # Main execution function
 def main():
-    """Main function to execute the program."""
-    data = load_data("data.json")
-    years = 1
-    total_projected_loss = calculate_projected_losses(data, years)
-    complex_total_projected_loss = calculate_complex_projected_losses(data, years)
+    """Main function for the losses calculator."""
+    parser = argparse.ArgumentParser(description="Calculate projected losses.")
+    parser.add_argument("data_file", help="Path to the JSON data file")
+    parser.add_argument(
+        "--years",
+        type=int,
+        default=1,
+        help="Number of years for projection (default: 1)",
+    )
+    parser.add_argument(
+        "--discount_rate",
+        type=float,
+        default=0.05,
+        help="Discount rate (default: 0.05)",
+    )
+    parser.add_argument(
+        "--maintenance_rate",
+        type=float,
+        default=50,
+        help="Maintenance rate (default: 50)",
+    )
+    args = parser.parse_args()
+
+    start_time = time.time()
+
+    data = load_data(args.data_file)
+
+    total_projected_loss = calculate_projected_losses(
+        data, args.years, args.discount_rate, args.maintenance_rate
+    )
+    complex_total_projected_loss = calculate_complex_projected_losses(
+        data, args.years, args.discount_rate
+    )
+
     print(f"Total Projected Loss: ${total_projected_loss:.2f}")
-    print(f"Complex Total Projected Loss: ${complex_total_projected_loss:.2f}")
+    print(f"Total Complex Projected Loss: ${complex_total_projected_loss['total']:.2f}")
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Execution time: {execution_time:.2f} seconds")
 
 
 if __name__ == "__main__":

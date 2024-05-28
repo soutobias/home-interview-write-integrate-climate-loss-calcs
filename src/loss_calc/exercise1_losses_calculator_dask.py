@@ -1,4 +1,4 @@
-""" This module calculates the total projected losses for a set of buildings based
+"""This module calculates the total projected losses for a set of buildings based
 on their construction cost, inflation rate, hazard probability, and floor area.
 The total projected losses are calculated as the sum of the present value of the
 risk-adjusted loss and the present value of the maintenance cost for each building.
@@ -10,32 +10,13 @@ The module provides two functions:
 - calculate_complex_projected_losses(building_data, years, discount_rate):
     Calculate the total projected losses with additional complexity and errors.
 """
+import argparse
+import time
 
 import numpy as np
 import pandas as pd
 import dask.dataframe as dd
-import json
 
-# Generate building data
-def generate_building_data(num_records, output_filename="generated_data.json"):
-    """Generate building data
-
-    Args:
-        num_records (int): Number of records to generate
-        output_filename (str, optional): Output filename. Defaults to "generated_data.json".
-    """
-    data = []
-    for building_id in range(1, num_records + 1):
-        record = {
-            "buildingId": building_id,
-            "floor_area": np.random.randint(500, 5001),
-            "construction_cost": np.random.randint(500, 5001),
-            "hazard_probability": round(np.random.randint(1, 21) / 100, 2),
-            "inflation_rate": round(np.random.randint(1, 6) / 100, 2),
-        }
-        data.append(record)
-    with open(output_filename, "w", encoding='utf-8') as f:
-        json.dump(data, f, indent=4)
 
 def load_data(filepath):
     """Load and parse the JSON data file
@@ -52,8 +33,14 @@ def load_data(filepath):
     """
 
     try:
-        df = pd.read_json(filepath)
-        ddf = dd.from_pandas(df, chunksize=1_000_000)
+        jsonl = filepath.endswith(".jsonl")
+        if jsonl:
+            ddf = dd.read_json(
+                filepath, orient="records", lines=True, blocksize=1_000_000
+            )
+        else:
+            df = pd.read_json(filepath)
+            ddf = dd.from_pandas(df, chunksize=1_000_000)
         # ddf = dd.from_pandas(df, npartitions=4)
         # ddf = dd.read_json(filepath, orient="records", lines=False, blocksize=None)
         # ddf = ddf.repartition(npartitions=8)
@@ -64,7 +51,9 @@ def load_data(filepath):
     except ValueError as e:
         print(f"Error loading JSON file: {e}")
         return None
-
+    except FileNotFoundError as e:
+        print(f"Error loading JSON file: {e}")
+        return None
     try:
         required_columns = [
             "construction_cost",
@@ -87,6 +76,7 @@ def load_data(filepath):
 
     ddf = ddf.set_index("buildingId")
     return ddf
+
 
 # Calculate total projected loss with additional complexity and errors
 def calculate_projected_losses(
@@ -117,6 +107,7 @@ def calculate_projected_losses(
 
     total_loss = (present_value_loss + total_maintenance_cost).sum().compute()
     return total_loss
+
 
 # Calculate total projected loss with additional complexity and errors
 def calculate_complex_projected_losses(
@@ -151,16 +142,49 @@ def calculate_complex_projected_losses(
 
     return potential_finantial_losses
 
+
 # Main execution function
 def main():
-    """Main function to execute the program."""
-    data = load_data("data.json")
-    years = 1
-    total_projected_loss = calculate_projected_losses(data, years)
-    complex_total_projected_loss = calculate_complex_projected_losses(data, years)
-    print(f"Total Projected Loss: ${total_projected_loss:.2f}")
-    print(f"Complex Total Projected Loss: ${complex_total_projected_loss:.2f}")
+    """Main function for the losses calculator."""
+    parser = argparse.ArgumentParser(description="Calculate projected losses.")
+    parser.add_argument("data_file", help="Path to the JSON data file")
+    parser.add_argument(
+        "--years",
+        type=int,
+        default=1,
+        help="Number of years for projection (default: 1)",
+    )
+    parser.add_argument(
+        "--discount_rate",
+        type=float,
+        default=0.05,
+        help="Discount rate (default: 0.05)",
+    )
+    parser.add_argument(
+        "--maintenance_rate",
+        type=float,
+        default=50,
+        help="Maintenance rate (default: 50)",
+    )
+    args = parser.parse_args()
 
+    start_time = time.time()
+
+    data = load_data(args.data_file)
+
+    total_projected_loss = calculate_projected_losses(
+        data, args.years, args.discount_rate, args.maintenance_rate
+    )
+    complex_total_projected_loss = calculate_complex_projected_losses(
+        data, args.years, args.discount_rate
+    )
+
+    print(f"Total Projected Loss: ${total_projected_loss:.2f}")
+    print(f"Total Complex Projected Loss: ${complex_total_projected_loss['total']:.2f}")
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+    print(f"Execution time: {execution_time:.2f} seconds")
 
 if __name__ == "__main__":
     main()

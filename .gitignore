@@ -37,8 +37,16 @@ terraform.rc
 *.ipynb
 *.ipynb_checkpoints
 
+# Ignore notebooks files and checkpoints
+*generated*.json*
+
 # Ignore python version
 .python-version
+.coverage
 
 # Ignore pycache
 __pycache__/
+.pytest_cache/
+
+# Ignore egg-info
+*.egg-info/

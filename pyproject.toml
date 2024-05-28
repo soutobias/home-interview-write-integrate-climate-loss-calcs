@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "loss_calc"
+version = "0.1.0"
+description = "A simple loss calculation model"
+requires-python = ">=3.10"
+authors = [{email = "tobias.ramalho.ferreira@gmail.com"},{name = "Tobias Ferreira"}]
+readme = "README.md"
+dependencies = [
+  "numpy>=1.23.4",
+  "pandas",
+  "dask[dataframe]",
+  "pyspark",
+  "fastapi",
+  "uvicorn",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["*"]
+exclude = ["*__pycache__*"]
+namespaces = true
+
+
+
+
