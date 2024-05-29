@@ -34,7 +34,6 @@ override.tf.json
 terraform.rc
 
 # Ignore notebooks files and checkpoints
-*.ipynb
 *.ipynb_checkpoints
 
 # Ignore notebooks files and checkpoints
