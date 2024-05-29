@@ -32,7 +32,10 @@ def load_data(filepath):
     """
 
     try:
-        df = pd.read_json(filepath, lines=filepath.endswith(".jsonl"))
+        chunks = pd.read_json(filepath, lines=filepath.endswith(".jsonl"), chunksize=10_000)
+        df = pd.concat(chunks, ignore_index=True)
+
+        # df = pd.read_json(filepath, lines=filepath.endswith(".jsonl"), chunksize=10000)
     except ValueError as e:
         print(f"Error loading JSON file: {e}")
         return None
@@ -63,6 +66,12 @@ def load_data(filepath):
     except TypeError as e:
         print(f"Error parsing data: {e}")
         return None
+
+    # downcast to reduce memory usage
+    df["construction_cost"] = pd.to_numeric(df["construction_cost"], downcast='float')
+    df["inflation_rate"] = pd.to_numeric(df["inflation_rate"], downcast='float')
+    df["hazard_probability"] = pd.to_numeric(df["hazard_probability"], downcast='float')
+    df["floor_area"] = pd.to_numeric(df["floor_area"], downcast='float')
 
     df.set_index("buildingId", inplace=True)
     return df
@@ -112,7 +121,7 @@ def calculate_projected_losses(
 # Calculate total projected loss with additional complexity and errors
 def calculate_complex_projected_losses(
     building_data: pd.DataFrame, years: int = 1, discount_rate: float = 0.05
-) -> float:
+) -> pd.Series:
     """Calculate the total projected losses with additional complexity and errors.
 
     Args:
@@ -123,14 +132,18 @@ def calculate_complex_projected_losses(
     Returns:
         float: Total projected losses with additional complexity and errors
     """
-    building_data["potential_finantial_losses"] = (
-        building_data["construction_cost"]
-        * np.exp(building_data["inflation_rate"] * building_data["floor_area"] / 1000)
-        * building_data["hazard_probability"]
-        / (1 + discount_rate) ** years
-    )
-    potential_finantial_losses = building_data.potential_finantial_losses.to_dict()
-    potential_finantial_losses["total"] = building_data.potential_finantial_losses.sum()
+    try:
+        building_data["potential_finantial_losses"] = (
+            building_data["construction_cost"]
+            * np.exp(building_data["inflation_rate"] * building_data["floor_area"] / 1000)
+            * building_data["hazard_probability"]
+            / (1 + discount_rate) ** years
+        )
+        potential_finantial_losses = building_data.potential_finantial_losses
+        potential_finantial_losses["total"] = building_data.potential_finantial_losses.sum()
+    except Exception as e:
+        print(f"Error calculating complex projected losses: {e}")
+        return None
     return potential_finantial_losses
 
 

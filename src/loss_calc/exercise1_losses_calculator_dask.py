@@ -38,9 +38,9 @@ def load_data(filepath):
             ddf = dd.read_json(
                 filepath, orient="records", lines=True, blocksize=1_000_000
             )
-        else:
+        else:        
             df = pd.read_json(filepath)
-            ddf = dd.from_pandas(df, chunksize=1_000_000)
+            ddf = dd.from_pandas(df, chunksize=100_000)
         # ddf = dd.from_pandas(df, npartitions=4)
         # ddf = dd.read_json(filepath, orient="records", lines=False, blocksize=None)
         # ddf = ddf.repartition(npartitions=8)

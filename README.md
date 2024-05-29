@@ -14,6 +14,8 @@ The assessment for Section 2 involves correcting, enhancing, and developing Pyth
 
 ## Exercise 1: Correcting and Enhancing the Loss Calculation Script
 
+<span style="color:red">CODES IMPLEMENTED IN THE FILE <strong>EXERCISE1_LOSSES_CALCULATOR.PY</strong></span>
+
 ### Task Description
 You are provided with a Python script (`exercise1_losses_calculator.py`) and a JSON file (`data.json`) containing data for five buildings. This script is designed to calculate total projected financial losses, taking into account factors such as inflation over time, the probability of hazard occurrence, and the process of discounting future losses to their present value.
 
@@ -38,6 +40,8 @@ Each entry in the `data.json` file includes:
 
 ## Exercise 2: Implementing a Complex Mathematical Loss Formula
 
+<span style="color:red">CODES IMPLEMENTED IN THE FILE <strong>EXERCISE1_LOSSES_CALCULATOR.PY</strong></span>
+
 ### Task Description
 Implement a complex mathematical formula in Python to calculate the potential financial losses estimate ('LE') using detailed attributes of the same five buildings.
 
@@ -55,8 +59,11 @@ The script should output the individual and total estimated losses for all prope
 
 ## Exercise 3: Scaling the Loss Calculation Model
 
+<span style="color:red">CODES IMPLEMENTED IN THE FILE <strong>EXERCISE1_LOSSES_CALCULATOR_DASK.PY</strong> AND <strong>EXERCISE1_LOSSES_CALCULATOR_SPARK.PY</strong> (IN PROGRESS)</span>
+
 ### Task Description
 Provide a written explanation of how you would scale your Python script from Exercise 2 to efficiently handle a dataset of 1,000,000 buildings.
+
 
 ### Requirements
 - **Scalability Analysis**: Evaluate the current script's performance with a larger dataset.
@@ -67,6 +74,28 @@ Provide a written explanation of how you would scale your Python script from Exe
 ### Expected Submission
 - **Written Explanation**: Detail your strategy for scaling the script, including recommended technologies or methods and their effectiveness.
 - **Code Snippets**: Optionally, provide code examples to support your explanations.
+
+
+<span style="color:red"><strong>MY STRATEGY</strong></span>
+<span style="color:red"> For small datasets, like the one available in the `data.json` file, I choose to work with Pandas. It is very efficient for smaller datasets due to its use of NumPy for vectorized operations.
+However, for large datasets with 1,000,000 records or more, using Pandas may not be a good strategy due to memory and performance constraints.
+To efficiently handle large-scale data, we need to assess and improve the script's performance to manage the increased load. The following strategies can be employed in my exercise:</span>
+
+<span style="color:red">- Parallelization with Dask (or PySpark - in progress): Allows parallel processing.</span>
+
+<span style="color:red">- Lazy Loading: Load data in chunks rather than loading the entire dataset into memory at once.</span>
+
+<span style="color:red">- Downcasting Data Types: Reduce data type precision.</span>
+
+<span style="color:red">I provide two code snippets using Dask and PySpark as examples. Additional strategies that can be applied to the data processing pipeline include:</span>
+
+<span style="color:red">- Convert Data to Efficient Storage Formats: Use formats like Parquet, which are optimized for performance and support columnar storage. Parquet files can be read efficiently on-the-fly using tools like PyArrow and Dask.</span>
+
+<span style="color:red">- Use Object Storage Solutions: Store large datasets in object storage and access them as needed, rather than uploading them directly to the backend.</span>
+
+<span style="color:red">It is also important to benchmark performance and identify bottlenecks using tools to measure processing time and profile the code.
+</span>
+
 
 ## Exercise 4: Live Interview Frontend Development
 

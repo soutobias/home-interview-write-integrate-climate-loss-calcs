@@ -13,8 +13,6 @@ from loss_calc.exercise1_losses_calculator import (
 
 
 class TestLossesCalculator(unittest.TestCase):
-    """Test cases for the losses calculator functions.
-    """
     def setUp(self):
         self.sample_data = [
             {
@@ -79,14 +77,10 @@ class TestLossesCalculator(unittest.TestCase):
         )
 
     def test_load_data_invalid_file(self):
-        """Test loading data from a nonexistent file.
-        """
         df = load_data("nonexistent_file.json")
         self.assertIsNone(df)
 
     def test_calculate_projected_losses(self):
-        """Test calculating projected losses.
-        """
         df = load_data("sample_data.json")
         result = calculate_projected_losses(df)
         self.assertAlmostEqual(result, 434117.05714285705, places=2)
@@ -105,8 +99,6 @@ class TestLossesCalculator(unittest.TestCase):
         self.assertNotAlmostEqual(result, 434117.05714285705, places=2)
 
     def test_calculate_complex_projected_losses(self):
-        """Test calculating complex projected losses.
-        """
         df = load_data("sample_data.json")
         result = calculate_complex_projected_losses(df)
         self.assertIsInstance(result, dict)
